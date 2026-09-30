@@ -21,6 +21,7 @@ import cordeu from "@/assets/cordeu.png";
 import rc from "@/assets/r-c.png";
 import blog from "@/assets/blog.jpg";
 import alugaki from "@/assets/alugaki.png";
+import bsSolucoes from "@/assets/BS.SOLUÇÕES.png";
 import painel from "@/assets/Paínel.png";
 import chave10 from "@/assets/chave10.png";
 import { SYSTEMS } from "@/lib/systems";
@@ -228,6 +229,7 @@ const sites: Project[] = [
   { img: cordeu, title: "Cordeu", desc: "Plataforma educacional moderna", url: "https://flowny-2026.github.io/projeto-cordeu/" },
   { img: rc, title: "R.C Pinturas e Decorações", desc: "Página de conversão otimizada", url: "https://flowny-2026.github.io/RC/" },
   { img: blog, title: "Blog Social", desc: "Plataforma de conteúdo e engajamento", url: "https://flowly-tech-2025.github.io/projeto-social/" },
+  { img: bsSolucoes, title: "BS Soluções", desc: "Site de soluções elétricas e de rede", url: "https://flowny-2026.github.io/BS.Solucoes/" },
 ];
 
 function ProjectCard({ p }: { p: Project }) {

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as Chave10RouteImport } from './routes/chave10'
+import { Route as PrivacidadeRouteImport } from './routes/privacidade'
 import { Route as VendaFacilRouteImport } from './routes/venda-facil'
 
 const IndexRoute = IndexRouteImport.update({
@@ -23,6 +24,11 @@ const Chave10Route = Chave10RouteImport.update({
   path: '/chave10',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PrivacidadeRoute = PrivacidadeRouteImport.update({
+  id: '/privacidade',
+  path: '/privacidade',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const VendaFacilRoute = VendaFacilRouteImport.update({
   id: '/venda-facil',
   path: '/venda-facil',
@@ -32,30 +38,34 @@ const VendaFacilRoute = VendaFacilRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/chave10': typeof Chave10Route
+  '/privacidade': typeof PrivacidadeRoute
   '/venda-facil': typeof VendaFacilRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/chave10': typeof Chave10Route
+  '/privacidade': typeof PrivacidadeRoute
   '/venda-facil': typeof VendaFacilRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/chave10': typeof Chave10Route
+  '/privacidade': typeof PrivacidadeRoute
   '/venda-facil': typeof VendaFacilRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chave10' | '/venda-facil'
+  fullPaths: '/' | '/chave10' | '/privacidade' | '/venda-facil'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chave10' | '/venda-facil'
-  id: '__root__' | '/' | '/chave10' | '/venda-facil'
+  to: '/' | '/chave10' | '/privacidade' | '/venda-facil'
+  id: '__root__' | '/' | '/chave10' | '/privacidade' | '/venda-facil'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   Chave10Route: typeof Chave10Route
+  PrivacidadeRoute: typeof PrivacidadeRoute
   VendaFacilRoute: typeof VendaFacilRoute
 }
 
@@ -75,6 +85,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Chave10RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/privacidade': {
+      id: '/privacidade'
+      path: '/privacidade'
+      fullPath: '/privacidade'
+      preLoaderRoute: typeof PrivacidadeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/venda-facil': {
       id: '/venda-facil'
       path: '/venda-facil'
@@ -88,6 +105,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   Chave10Route: Chave10Route,
+  PrivacidadeRoute: PrivacidadeRoute,
   VendaFacilRoute: VendaFacilRoute,
 }
 export const routeTree = rootRouteImport

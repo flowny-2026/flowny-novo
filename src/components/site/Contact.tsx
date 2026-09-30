@@ -1,6 +1,15 @@
 import { useState, type FormEvent } from "react";
-import { MessageCircle, Mail, MapPin, Send, Instagram } from "lucide-react";
+import emailjs from "@emailjs/browser";
+import { MessageCircle, Mail, MapPin, Send, Instagram, Loader2, CheckCircle } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { WHATSAPP_URL } from "./Sections";
+
+// Configuração do EmailJS (mesmas credenciais do projeto anterior)
+const EMAILJS_CONFIG = {
+  publicKey: "FnmWCrl1UeOzRr2cq",
+  serviceId: "service_rfaevlt",
+  templateId: "template_gptydxj",
+};
 
 const infos = [
   { icon: MessageCircle, title: "WhatsApp", value: "(16) 99291-5540", hint: "Online agora", href: WHATSAPP_URL },
@@ -8,25 +17,42 @@ const infos = [
   { icon: MapPin, title: "Localização", value: "Ribeirão Preto, São Paulo", hint: "Atendimento remoto" },
 ];
 
+type Status = "idle" | "sending" | "success" | "error";
+
 export function Contact() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", message: "" });
+  const [status, setStatus] = useState<Status>("idle");
 
-  function submit(e: FormEvent) {
+  async function submit(e: FormEvent) {
     e.preventDefault();
-    const text = [
-      `Olá! Meu nome é ${form.name}.`,
-      `E-mail: ${form.email}`,
-      form.phone && `Telefone: ${form.phone}`,
-      "",
-      form.message,
-    ]
-      .filter(Boolean)
-      .join("\n");
-    window.open(`${WHATSAPP_URL}?text=${encodeURIComponent(text)}`, "_blank", "noopener");
+    setStatus("sending");
+
+    try {
+      await emailjs.send(
+        EMAILJS_CONFIG.serviceId,
+        EMAILJS_CONFIG.templateId,
+        {
+          from_name: form.name,
+          from_email: form.email,
+          phone: form.phone || "Não informado",
+          message: form.message,
+        },
+        EMAILJS_CONFIG.publicKey,
+      );
+      setStatus("success");
+      setForm({ name: "", email: "", phone: "", message: "" });
+      // Volta ao estado normal após 4 segundos
+      setTimeout(() => setStatus("idle"), 4000);
+    } catch {
+      setStatus("error");
+      setTimeout(() => setStatus("idle"), 4000);
+    }
   }
 
   const field =
-    "w-full rounded-xl border border-border bg-input px-4 py-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-ring/40";
+    "w-full rounded-xl border border-border bg-input px-4 py-3 text-sm outline-none placeholder:text-muted-foreground/70 focus:border-primary focus:ring-2 focus:ring-ring/40 disabled:opacity-50";
+
+  const isBusy = status === "sending";
 
   return (
     <section id="contato" className="bg-navy-deep py-24">
@@ -62,17 +88,7 @@ export function Contact() {
             })}
           </ul>
 
-          <div className="mt-10 grid grid-cols-2 gap-4">
-            {[
-              ["50+", "Projetos Entregues"],
-              ["24h", "Tempo de Resposta"],
-            ].map(([n, l]) => (
-              <div key={l} className="rounded-2xl border border-border p-5">
-                <p className="text-3xl font-extrabold text-primary">{n}</p>
-                <p className="text-sm text-muted-foreground">{l}</p>
-              </div>
-            ))}
-          </div>
+
         </div>
 
         <form onSubmit={submit} className="glass-card rounded-3xl p-8 md:p-10">
@@ -83,6 +99,7 @@ export function Contact() {
               className={field}
               placeholder="Nome Completo"
               required
+              disabled={isBusy}
               value={form.name}
               onChange={(e) => setForm({ ...form, name: e.target.value })}
             />
@@ -91,6 +108,7 @@ export function Contact() {
               type="email"
               placeholder="E-mail"
               required
+              disabled={isBusy}
               value={form.email}
               onChange={(e) => setForm({ ...form, email: e.target.value })}
             />
@@ -98,6 +116,7 @@ export function Contact() {
               className={field}
               type="tel"
               placeholder="Telefone (opcional)"
+              disabled={isBusy}
               value={form.phone}
               onChange={(e) => setForm({ ...form, phone: e.target.value })}
             />
@@ -105,17 +124,32 @@ export function Contact() {
               className={`${field} min-h-32 resize-y`}
               placeholder="Descreva seu projeto"
               required
+              disabled={isBusy}
               value={form.message}
               onChange={(e) => setForm({ ...form, message: e.target.value })}
             />
           </div>
+
+          {/* Feedback de erro */}
+          {status === "error" && (
+            <p className="mt-4 rounded-xl border border-destructive/40 bg-destructive/10 px-4 py-3 text-sm text-destructive">
+              Erro ao enviar. Tente novamente ou fale pelo WhatsApp.
+            </p>
+          )}
+
           <button
             type="submit"
-            className="bg-cta mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-cta transition-transform hover:-translate-y-0.5"
+            disabled={isBusy || status === "success"}
+            className="bg-cta mt-6 inline-flex w-full items-center justify-center gap-2 rounded-full py-3.5 text-sm font-bold uppercase tracking-wide text-accent-foreground shadow-cta transition-transform hover:-translate-y-0.5 disabled:opacity-70 disabled:cursor-not-allowed disabled:hover:translate-y-0"
           >
-            Enviar Mensagem <Send className="size-4" />
+            {status === "sending" && <><Loader2 className="size-4 animate-spin" /> Enviando...</>}
+            {status === "success" && <><CheckCircle className="size-4" /> Mensagem Enviada!</>}
+            {(status === "idle" || status === "error") && <><Send className="size-4" /> Enviar Mensagem</>}
           </button>
-          <p className="mt-3 text-center text-xs text-muted-foreground">Você será direcionado ao WhatsApp.</p>
+
+          <p className="mt-3 text-center text-xs text-muted-foreground">
+            Sua mensagem será enviada diretamente por e-mail.
+          </p>
         </form>
       </div>
     </section>
@@ -137,6 +171,9 @@ export function Footer() {
           <a href="mailto:contato@flowny.com.br" className="hover:text-primary">
             contato@flowny.com.br
           </a>
+          <Link to="/privacidade" className="hover:text-primary">
+            Política de Privacidade
+          </Link>
         </div>
       </div>
     </footer>
